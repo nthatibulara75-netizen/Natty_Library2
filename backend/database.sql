@@ -1,0 +1,29 @@
+CREATE DATABASE IF NOT EXISTS natty_library;
+USE natty_library;
+CREATE TABLE IF NOT EXISTS users(
+ id INT AUTO_INCREMENT PRIMARY KEY,
+ name VARCHAR(100) NOT NULL,
+ membership_id VARCHAR(40) NOT NULL UNIQUE,
+ role ENUM('admin','librarian','member') NOT NULL DEFAULT 'member',
+ password_hash VARCHAR(255) NOT NULL
+);
+CREATE TABLE IF NOT EXISTS books(
+ id INT AUTO_INCREMENT PRIMARY KEY,
+ title VARCHAR(150) NOT NULL,
+ author VARCHAR(100) NOT NULL,
+ genre VARCHAR(70) NOT NULL,
+ isbn VARCHAR(30) NOT NULL UNIQUE,
+ quantity INT NOT NULL DEFAULT 0,
+ CHECK(quantity>=0)
+);
+CREATE TABLE IF NOT EXISTS transactions(
+ id INT AUTO_INCREMENT PRIMARY KEY,
+ book_id INT NOT NULL,
+ user_id INT NULL,
+ kind ENUM('add','borrow') NOT NULL,
+ quantity INT NOT NULL,
+ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+ FOREIGN KEY(book_id) REFERENCES books(id),
+ FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE SET NULL,
+ CHECK(quantity>0)
+);

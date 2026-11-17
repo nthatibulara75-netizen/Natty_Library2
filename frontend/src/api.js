@@ -1,0 +1,1 @@
+export async function api(path,options={}){const token=localStorage.getItem("nattyToken");const r=await fetch("http://localhost:5000"+path,{...options,headers:{"Content-Type":"application/json",...(token?{Authorization:"Bearer "+token}:{}),...options.headers}});const d=await r.json();if(!r.ok)throw Error(d.message||"Request failed");return d;}
