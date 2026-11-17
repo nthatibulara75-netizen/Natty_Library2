@@ -2,83 +2,147 @@
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Natty Library</title>
 <style>
-body{margin:0;background:#f0f0f0;font-family:Arial}
+*{box-sizing:border-box}body{margin:0;font-family:Arial;background:#f5f5ef}
 .login{max-width:380px;margin:80px auto;background:white;padding:30px;border-radius:10px;text-align:center;box-shadow:0 0 10px #ccc}
-.login h1{margin:0}.login p{color:#666;font-size:13px}
-input{width:100%;padding:12px;margin:8px 0;box-sizing:border-box;background:#e8eef5;border:none;border-radius:5px}
-button{width:100%;padding:12px;background:#2e8b57;color:white;border:none;border-radius:5px;cursor:pointer;font-size:16px}
-.top{background:#14532d;color:white;padding:15px;display:flex;justify-content:space-between}
-.box{max-width:800px;margin:20px auto;background:white;padding:20px;border-radius:10px}
-.card{border:1px solid #ddd;padding:10px;margin:10px 0;border-radius:8px}
-.del{background:#dc2626}.edit{background:#2563eb}.small{width:auto;padding:6px 10px}
+.login input{width:100%;padding:12px;margin:8px 0;background:#e8eef5;border:none;border-radius:5px}
+.login button{width:100%;padding:12px;background:#2e8b57;color:white;border:none;border-radius:5px;cursor:pointer;font-size:16px}
+.layout{display:flex;min-height:100vh}
+.side{width:240px;background:#14532d;color:white;padding:20px;flex-shrink:0}
+.side h2{margin:0}.side p{font-size:12px;color:#ccc}
+.side a{display:block;color:white;text-decoration:none;padding:12px;border-radius:8px;margin:6px 0;cursor:pointer}
+.side a.on,.side a:hover{background:#1a6b3a}
+.side .foot{margin-top:40px;border-top:1px solid #ffffff33;padding-top:10px;font-size:13px}
+.main{flex:1;padding:20px}
+.cards{display:flex;gap:15px;flex-wrap:wrap}
+.card{background:white;padding:20px;border-radius:10px;flex:1;min-width:150px}
+.card b{font-size:28px}
+.box{background:white;padding:20px;border-radius:10px;margin-top:15px}
+input,select{width:100%;padding:10px;margin:6px 0;background:#eef2f5;border:none;border-radius:5px}
+button{padding:10px 15px;background:#14532d;color:white;border:none;border-radius:6px;cursor:pointer}
+button.del{background:#dc2626}button.edit{background:#2563eb}button.small{padding:6px 10px}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{padding:10px;border-bottom:1px solid #eee;text-align:left;font-size:14px}
+@media(max-width:700px){.layout{flex-direction:column}.side{width:100%}}
 </style></head>
 <body>
+
 <div id="loginPage" class="login">
-<h1>Natty Library</h1><p>Sign in to continue</p>
-<div style="text-align:left;font-size:12px">Membership ID</div>
-<input id="mid" value="NATTY001">
-<div style="text-align:left;font-size:12px">Password</div>
-<input id="pwd" type="password" value="admin123">
-<button onclick="login()">Login</button>
-<p id="msg"></p>
+<h1>Natty Library</h1><p style="color:#666">Sign in to continue</p>
+<div style="text-align:left;font-size:12px">Membership ID</div><input id="mid" value="NATTY001">
+<div style="text-align:left;font-size:12px">Password</div><input id="pwd" type="password" value="admin123">
+<button onclick="login()">Login</button><p id="msg"></p>
 </div>
 
-<div id="dash" style="display:none">
-<div class="top"><b>Natty Library</b><span id="hi"></span></div>
-<div class="box">
-<h2>Dashboard - <span id="count"></span> Books</h2>
-<input id="search" placeholder="Search books..." onkeyup="render()">
-<h3>Add / Update Book</h3>
-<input id="title" placeholder="Book Title">
-<input id="author" placeholder="Author">
-<input id="isbn" placeholder="ISBN">
-<input id="qty" type="number" placeholder="Quantity">
-<button onclick="saveBook()">Save Book</button>
-<button onclick="logout()" style="background:#666;margin-top:5px">Logout</button>
-<div id="list"></div>
-</div></div>
+<div id="app" style="display:none">
+<div class="layout">
+<div class="side">
+<h2>Natty Library</h2><p>Library Management System</p>
+<a id="mDash" class="on" onclick="show('dash')">Dashboard</a>
+<a id="mBooks" onclick="show('books')">Book Management</a>
+<a id="mTrans" onclick="show('trans')">Transactions</a>
+<a id="mUsers" onclick="show('users')">User Management</a>
+<div class="foot"><b>Library Administrator</b><br>Admin<br><br><a onclick="logout()" style="padding:0">Log out</a></div>
+</div>
+
+<div class="main">
+<div id="pageDash">
+<h2>Dashboard</h2><p style="color:#666">See the books and available copies in the library.</p>
+<div class="cards">
+<div class="card">Book titles<br><b id="cTitles">0</b></div>
+<div class="card">Copies in stock<br><b id="cCopies">0</b></div>
+<div class="card">Low stock<br><b id="cLow">0</b></div>
+</div>
+<div class="box"><h3>Book availability</h3><input id="search" placeholder="Search books..." onkeyup="render()"><div id="table"></div></div>
+</div>
+
+<div id="pageBooks" style="display:none">
+<h2>Book Management</h2>
+<div class="box"><h3>Add / Update Book</h3>
+<input id="title" placeholder="Book Title"><input id="author" placeholder="Author">
+<input id="genre" placeholder="Genre e.g. Fiction"><input id="isbn" placeholder="ISBN">
+<input id="qty" type="number" placeholder="Quantity / Stock">
+<button onclick="saveBook()">Save Book</button></div>
+<div class="box"><h3>All Books</h3><div id="list"></div></div>
+</div>
+
+<div id="pageTrans" style="display:none">
+<h2>Transactions</h2>
+<div class="box"><h3>Borrow / Return</h3>
+<input id="tBook" placeholder="Book Title"><input id="tUser" placeholder="Member ID e.g. NATTY001">
+<select id="tType"><option>Borrow</option><option>Return</option></select>
+<button onclick="saveTrans()">Save Transaction</button><div id="transList"></div></div>
+</div>
+
+<div id="pageUsers" style="display:none">
+<h2>User Management</h2>
+<div class="box"><h3>Add User</h3>
+<input id="uName" placeholder="Full Name"><input id="uId" placeholder="Membership ID e.g. NATTY002">
+<button onclick="saveUser()">Add User</button><div id="userList"></div></div>
+</div>
+
+</div></div></div>
 
 <script>
 var books=JSON.parse(localStorage.getItem('natty_books')||'[]');
-if(books.length==0){books=[{title:'Things Fall Apart',author:'Chinua Achebe',isbn:'12345',qty:5},{title:'Purple Hibiscus',author:'Chimamanda Ngozi',isbn:'67890',qty:3}];}
+if(books.length==0){books=[{title:'Sefahle ba LELLO',author:'S.M. Mofokeng',genre:'Fiction',isbn:'978-1-234',qty:1},{title:'Things Fall Apart',author:'Chinua Achebe',genre:'Fiction',isbn:'12345',qty:5}];save();}
+var trans=JSON.parse(localStorage.getItem('natty_trans')||'[]');
+var users=JSON.parse(localStorage.getItem('natty_users')||'[]');
+if(users.length==0){users=[{name:'Admin',id:'NATTY001'}];saveUsers();}
 var editIndex=-1;
-function login(){
-var u=document.getElementById('mid').value;
-if(!u){document.getElementById('msg').innerHTML='Enter Membership ID';return;}
-localStorage.setItem('natty_user',u);
-showApp();
-}
+function save(){localStorage.setItem('natty_books',JSON.stringify(books));}
+function saveUsers(){localStorage.setItem('natty_users',JSON.stringify(users));}
+function login(){var u=document.getElementById('mid').value;if(!u){document.getElementById('msg').innerHTML='Enter Membership ID';return;}localStorage.setItem('natty_user',u);showApp();}
 function logout(){localStorage.removeItem('natty_user');location.reload();}
-function showApp(){
-var u=localStorage.getItem('natty_user');if(!u)return;
-document.getElementById('loginPage').style.display='none';
-document.getElementById('dash').style.display='block';
-document.getElementById('hi').innerHTML='Hi, '+u;
-render();
+function showApp(){var u=localStorage.getItem('natty_user');if(!u)return;document.getElementById('loginPage').style.display='none';document.getElementById('app').style.display='block';render();}
+function show(p){
+document.getElementById('pageDash').style.display=p=='dash'?'block':'none';
+document.getElementById('pageBooks').style.display=p=='books'?'block':'none';
+document.getElementById('pageTrans').style.display=p=='trans'?'block':'none';
+document.getElementById('pageUsers').style.display=p=='users'?'block':'none';
+document.getElementById('mDash').className=p=='dash'?'on':'';document.getElementById('mBooks').className=p=='books'?'on':'';
+document.getElementById('mTrans').className=p=='trans'?'on':'';document.getElementById('mUsers').className=p=='users'?'on':'';
 }
 function saveBook(){
-var t=document.getElementById('title').value;
-var a=document.getElementById('author').value;
-var i=document.getElementById('isbn').value;
-var q=document.getElementById('qty').value;
+var t=document.getElementById('title').value;var a=document.getElementById('author').value;
+var g=document.getElementById('genre').value;var i=document.getElementById('isbn').value;var q=parseInt(document.getElementById('qty').value||'1');
 if(!t||!a){alert('Title + Author needed');return;}
-var b={title:t,author:a,isbn:i,qty:q||1};
-if(editIndex>=0){books[editIndex]=b;editIndex=-1;}else{books.push(b);}
-localStorage.setItem('natty_books',JSON.stringify(books));
-document.getElementById('title').value='';document.getElementById('author').value='';document.getElementById('isbn').value='';document.getElementById('qty').value='';
-render();
+var b={title:t,author:a,genre:g||'General',isbn:i,qty:q};
+if(editIndex>=0){books[editIndex]=b;editIndex=-1;}else{books.push(b);}save();
+document.getElementById('title').value='';document.getElementById('author').value='';document.getElementById('genre').value='';document.getElementById('isbn').value='';document.getElementById('qty').value='';
+render();alert('Book saved!');
+}
+function delBook(i){if(confirm('Delete this book?')){books.splice(i,1);save();render();}}
+function editBook(i){var b=books[i];document.getElementById('title').value=b.title;document.getElementById('author').value=b.author;document.getElementById('genre').value=b.genre;document.getElementById('isbn').value=b.isbn;document.getElementById('qty').value=b.qty;editIndex=i;show('books');window.scrollTo(0,0);}
+function saveTrans(){
+var b=document.getElementById('tBook').value;var u=document.getElementById('tUser').value;var ty=document.getElementById('tType').value;
+if(!b||!u){alert('Book + Member needed');return;}
+trans.push({book:b,user:u,type:ty,date:new Date().toLocaleDateString()});
+localStorage.setItem('natty_trans',JSON.stringify(trans));
+document.getElementById('tBook').value='';document.getElementById('tUser').value='';renderTrans();alert('Transaction saved!');
+}
+function saveUser(){
+var n=document.getElementById('uName').value;var id=document.getElementById('uId').value;
+if(!n||!id){alert('Name + ID needed');return;}
+users.push({name:n,id:id});saveUsers();document.getElementById('uName').value='';document.getElementById('uId').value='';renderUsers();alert('User added!');
 }
 function render(){
 var s=document.getElementById('search').value.toLowerCase();
-var html='';var shown=0;
-for(var k=0;k<books.length;k++){var b=books[k];
+var total=0;var low=0;var html='<table><tr><th>TITLE</th><th>AUTHOR</th><th>GENRE</th><th>STOCK</th><th></th></tr>';
+var listHtml='';
+for(var k=0;k<books.length;k++){var b=books[k];total+=b.qty;if(b.qty<=1)low++;
 if((b.title+b.author).toLowerCase().indexOf(s)==-1)continue;
-shown++;
-html+='<div class="card"><b>'+b.title+'</b><br>'+b.author+' - ISBN: '+b.isbn+' - Qty: '+b.qty+'<br><button class="small edit" onclick="editBook('+k+')">Update</button> <button class="small del" onclick="delBook('+k+')">Delete</button></div>';}
-document.getElementById('count').innerHTML=shown;
-document.getElementById('list').innerHTML=html||'<p>No books</p>';
+html+='<tr><td>'+b.title+'</td><td>'+b.author+'</td><td>'+b.genre+'</td><td>'+b.qty+'</td><td><button class="small edit" onclick="editBook('+k+')">Update</button> <button class="small del" onclick="delBook('+k+')">Delete</button></td></tr>';
+listHtml+='<div style="border-bottom:1px solid #eee;padding:10px"><b>'+b.title+'</b> - '+b.author+' - '+b.genre+' - Qty: '+b.qty+' <button class="small edit" onclick="editBook('+k+')">Update</button> <button class="small del" onclick="delBook('+k+')">Delete</button></div>';
 }
-function delBook(i){if(confirm('Delete this book?')){books.splice(i,1);localStorage.setItem('natty_books',JSON.stringify(books));render();}}
-function editBook(i){var b=books[i];document.getElementById('title').value=b.title;document.getElementById('author').value=b.author;document.getElementById('isbn').value=b.isbn;document.getElementById('qty').value=b.qty;editIndex=i;window.scrollTo(0,0);}
+html+='</table>';
+document.getElementById('cTitles').innerHTML=books.length;
+document.getElementById('cCopies').innerHTML=total;
+document.getElementById('cLow').innerHTML=low;
+document.getElementById('table').innerHTML=html;
+document.getElementById('list').innerHTML=listHtml||'No books';
+renderTrans();renderUsers();
+}
+function renderTrans(){var h='';for(var i=0;i<trans.length;i++){h+='<div style="border-bottom:1px solid #eee;padding:8px">'+trans[i].type+' - '+trans[i].book+' - '+trans[i].user+' - '+trans[i].date+'</div>';}document.getElementById('transList').innerHTML=h||'No transactions yet';}
+function renderUsers(){var h='';for(var i=0;i<users.length;i++){h+='<div style="border-bottom:1px solid #eee;padding:8px">'+users[i].name+' - '+users[i].id+'</div>';}document.getElementById('userList').innerHTML=h;}
 showApp();
 </script></body></html>
